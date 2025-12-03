@@ -52,7 +52,34 @@ If you did not cache the data, you will need to pass `maybe_stream=True` to the 
 ```python
 reader = ds.get_clip_feature(clip_id, "camera_front_wide_120fov")
 frame_indices = np.array([0, 1, 2]) # get first 3 frames
-frames = reader.decode_images_from_frame_indices(frame_indices) # (N, H, W, C)
+frames = reader.decode_images_from_frame_indices(frame_indices) # (N, H, W, C) numpy array
+```
+
+## Lidar Data
+```python
+chunk_id = ds.get_clip_chunk(clip_id)
+
+ds.download_chunk_features(
+    int(chunk_id),
+    features=ds.features.LIDAR.LIDAR_TOP_360FOV
+)
+
+reader = ds.get_clip_feature(clip_id, "lidar_top_360fov") # dict
+```
+## Radar Data
+
+```python
+chunk_id = ds.get_clip_chunk(clip_id)
+
+ds.download_chunk_features(
+    int(chunk_id),
+    features=ds.features.RADAR.ALL
+)
+
+reader = ds.get_clip_feature(clip_id, "radar_corner_front_left_srr_0") # dict
+
+# instead of .ALL you can choose a specific radar on the vehicle. See the huggingface repo.
+
 ```
 
 ## Calibration Data
