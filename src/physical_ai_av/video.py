@@ -8,9 +8,19 @@ import logging
 import av
 import numpy as np
 
-from torchcodec.decoders import VideoDecoder
+import importlib.util
 
 logger = logging.getLogger(__name__)
+
+
+try:
+    from torchcodec.decoders import VideoDecoder
+    _TORCHCODEC_AVAILABLE = True
+except RuntimeError:
+    _TORCHCODEC_AVAILABLE = False
+    logger.debug("gpu version of torchcodec not available, TorchCodecVideoReader will not be available")
+
+
 
 
 class VideoReader(abc.ABC):
@@ -271,32 +281,36 @@ class SeekVideoReader(VideoReader):
 
 
 
-class TorchCodecVideoReader(VideoReader):
-    def __init__(
-        self,
-        video_data: io.BytesIO,
-        timestamps: np.ndarray | None = None,
-        thread_count: int = 1,
-        device: str = "cuda",
-    ):
+if _TORCHCODEC_AVAILABLE:
 
-        super().__init__(
-            video_data=video_data,
-            timestamps=timestamps,
-            thread_count=thread_count,
-        )
+    from torchcodec.decoders import VideoDecoder
 
-        self.decoder = VideoDecoder(
-            video_data,
-            dimension_order="NHWC",
-            device=device,
-        )
-        self.device = device
+    class TorchCodecVideoReader(VideoReader):
+        def __init__(
+            self,
+            video_data: io.BytesIO,
+            timestamps: np.ndarray | None = None,
+            thread_count: int = 1,
+            device: str = "cuda",
+        ):
 
-    def close(self):
-        pass
+            super().__init__(
+                video_data=video_data,
+                timestamps=timestamps,
+                thread_count=thread_count,
+            )
 
-    def decode_images_from_frame_indices(self, frame_indices: np.ndarray) -> np.ndarray:
-        frames = self.decoder.get_frames_at(frame_indices)
-        # frames is a torch tensor on the specified device, need to convert to numpy
-        return frames.data.cpu().numpy()
+            self.decoder = VideoDecoder(
+                video_data,
+                dimension_order="NHWC",
+                device=device,
+            )
+            self.device = device
+
+        def close(self):
+            pass
+
+        def decode_images_from_frame_indices(self, frame_indices: np.ndarray) -> np.ndarray:
+            frames = self.decoder.get_frames_at(frame_indices)
+            # frames is a torch tensor on the specified device, need to convert to numpy
+            return frames.data.cpu().numpy()

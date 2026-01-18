@@ -15,14 +15,16 @@ from physical_ai_av.utils import hf_interface
 
 import importlib.util
 
-# Fast check for optional dependencies
-_TORCH_AVAILABLE = importlib.util.find_spec("torch") is not None
-
-
-
-
-
 logger = logging.getLogger(__name__)
+
+
+try:
+    from torchcodec.decoders import VideoDecoder
+    _TORCHCODEC_AVAILABLE = True
+except RuntimeError:
+    _TORCHCODEC_AVAILABLE = False
+    logger.debug("gpu version of torchcodec not available, TorchCodecVideoReader will not be available")
+
 
 
 class PhysicalAIAVDatasetInterface(hf_interface.HfRepoInterface):
@@ -158,9 +160,9 @@ class PhysicalAIAVDatasetInterface(hf_interface.HfRepoInterface):
                             )["timestamp"].to_numpy()
 
                         if use_torch_codec:
-                            if not _TORCH_AVAILABLE:
+                            if not _TORCHCODEC_AVAILABLE:
                                 raise RuntimeError(
-                                    "use_torch_codec=True requires PyTorch to be installed, but torch was not found."
+                                    "use_torch_codec=True requires torchcodec to be installed and machine with gpu. Ensure you have a gpu on this node (check with `nvidia-smi`) and that you can import torchcodec successfully (try `python -c \"import torchcodec\"`)"
                                 )
 
                             return video.TorchCodecVideoReader(

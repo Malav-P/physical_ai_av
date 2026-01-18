@@ -167,3 +167,21 @@ reader = ds.get_clip_feature(clip_id, "camera_front_wide_120fov", use_torch_code
 ```
 
 Note that if a gpu is not found, this code will error since the cpu version of torchcodec is not installed.
+
+## Benchmark Test
+
+Tested on torch==2.9.1+cu130, torchvision==0.24.1+cu130, torchcodec==0.9.1+cu130 on A100 GPU.
+
+- **Clip ID:** `2edf278f-d5e3-4b83-b5df-923a04335725`
+- **Number of frames to decode:** 400
+- **Shape:** `(400, 1080, 1920, 3)`  
+
+
+| Configuration        | Time (seconds) |
+|----------------------|----------------|
+| WITH `torchcodec`    | 1.8695         |
+| WITHOUT `torchcodec` | 6.8468         |
+
+**Speedup:** **3.66×**
+
+
