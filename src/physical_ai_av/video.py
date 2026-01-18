@@ -298,4 +298,5 @@ class TorchCodecVideoReader(VideoReader):
 
     def decode_images_from_frame_indices(self, frame_indices: np.ndarray) -> np.ndarray:
         frames = self.decoder.get_frames_at(frame_indices)
+        # frames is a torch tensor on the specified device, need to convert to numpy
         return frames.data.cpu().numpy()
