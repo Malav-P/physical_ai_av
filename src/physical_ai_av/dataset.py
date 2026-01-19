@@ -11,20 +11,12 @@ from typing import Any, Iterable
 
 import pandas as pd
 from physical_ai_av import egomotion, video
+from physical_ai_av.video import _TORCHCODEC_AVAILABLE
 from physical_ai_av.utils import hf_interface
 
 import importlib.util
 
 logger = logging.getLogger(__name__)
-
-
-try:
-    from torchcodec.decoders import VideoDecoder
-    _TORCHCODEC_AVAILABLE = True
-except RuntimeError:
-    _TORCHCODEC_AVAILABLE = False
-    logger.debug("gpu version of torchcodec not available, TorchCodecVideoReader will not be available")
-
 
 
 class PhysicalAIAVDatasetInterface(hf_interface.HfRepoInterface):

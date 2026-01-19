@@ -156,7 +156,7 @@ pip install -e .
 ```
 
 2.  follow the instructions to [install torchcodec](https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec).
-  These instructions help install torchcodec, cuda-enabled pytorch, and ffmpeg to your environment.
+These instructions help install torchcodec, cuda-enabled pytorch, and ffmpeg to your environment.
 
 ## Usage
 
